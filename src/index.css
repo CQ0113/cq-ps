@@ -314,15 +314,31 @@ button:focus-visible,
 .ql-editor-display ul {
   margin: 0.75rem 0;
   padding-left: 2rem;
+  list-style-type: disc;
 }
 
 .ql-editor-display ol {
   margin: 0.75rem 0;
   padding-left: 2rem;
+  list-style-type: decimal;
 }
 
 .ql-editor-display li {
+  display: list-item;
   margin: 0.375rem 0;
+}
+
+.ql-editor-display li[data-list="bullet"] {
+  list-style-type: disc;
+}
+
+.ql-editor-display li[data-list="ordered"] {
+  list-style-type: decimal;
+}
+
+.ql-editor-display li[data-list="bullet"]::marker,
+.ql-editor-display li[data-list="ordered"]::marker {
+  color: #93c5fd;
 }
 
 .ql-editor-display blockquote {
