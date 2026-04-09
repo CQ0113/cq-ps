@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Pencil, Trash2 } from "lucide-react";
 import { categoryConfig } from "../../config/categoryConfig";
 import { renderRecordSummary } from "../../utils/formHelpers";
 
@@ -7,9 +7,12 @@ function CollectionList({
   records,
   loading,
   onEdit,
-  onDelete
+  onDelete,
+  onMoveUp,
+  onMoveDown
 }) {
   const config = categoryConfig[category];
+  const isProjectCategory = category === "projects";
 
   return (
     <div className="mt-5 space-y-3">
@@ -25,7 +28,7 @@ function CollectionList({
         </p>
       )}
 
-      {records.map((record) => (
+      {records.map((record, index) => (
         <article
           key={record.id}
           className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-4"
@@ -38,6 +41,26 @@ function CollectionList({
               <div className="mt-2">{renderRecordSummary(category, record)}</div>
             </div>
             <div className="flex items-center gap-2">
+              {isProjectCategory && (
+                <>
+                  <button
+                    onClick={() => onMoveUp?.(record.id)}
+                    disabled={index === 0}
+                    className="inline-flex items-center gap-1 rounded-md border border-zinc-700 px-2 py-1.5 text-xs text-zinc-200 transition hover:border-zinc-600 disabled:cursor-not-allowed disabled:opacity-40"
+                    title="Move up"
+                  >
+                    <ArrowUp size={14} />
+                  </button>
+                  <button
+                    onClick={() => onMoveDown?.(record.id)}
+                    disabled={index === records.length - 1}
+                    className="inline-flex items-center gap-1 rounded-md border border-zinc-700 px-2 py-1.5 text-xs text-zinc-200 transition hover:border-zinc-600 disabled:cursor-not-allowed disabled:opacity-40"
+                    title="Move down"
+                  >
+                    <ArrowDown size={14} />
+                  </button>
+                </>
+              )}
               <button
                 onClick={() => onEdit(record)}
                 className="inline-flex items-center gap-1 rounded-md border border-zinc-700 px-2.5 py-1.5 text-xs text-zinc-200 transition hover:border-zinc-600"

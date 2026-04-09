@@ -5,7 +5,8 @@ import {
   doc,
   onSnapshot,
   serverTimestamp,
-  updateDoc
+  updateDoc,
+  writeBatch
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 
@@ -50,4 +51,19 @@ export async function updateCollectionItem(collectionName, id, payload) {
 export async function deleteCollectionItem(collectionName, id) {
   const docRef = doc(db, collectionName, id);
   return deleteDoc(docRef);
+}
+
+export async function reorderCollectionItems(collectionName, orderedIds) {
+  const batch = writeBatch(db);
+  const total = orderedIds.length;
+
+  orderedIds.forEach((id, index) => {
+    const docRef = doc(db, collectionName, id);
+    batch.update(docRef, {
+      order: total - index,
+      updatedAt: serverTimestamp()
+    });
+  });
+
+  return batch.commit();
 }

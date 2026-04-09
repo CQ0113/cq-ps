@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import {
   addCollectionItem,
   deleteCollectionItem,
+  reorderCollectionItems,
   subscribeToCollection,
   updateCollectionItem
 } from "../services/firestoreService";
@@ -42,6 +43,13 @@ function AdminPage() {
   const currentRecords = recordsByCategory[activeCategory] ?? [];
   const currentLoading = loadingByCategory[activeCategory];
 
+  const sortRecordsForCategory = (category, records) => {
+    if (category === "projects") {
+      return [...records].sort((a, b) => (Number(b.order) || 0) - (Number(a.order) || 0));
+    }
+    return records;
+  };
+
   useEffect(() => {
     const unsubscribers = categoryOrder.map((category) =>
       subscribeToCollection(
@@ -49,7 +57,7 @@ function AdminPage() {
         (records) => {
           setRecordsByCategory((previous) => ({
             ...previous,
-            [category]: records
+            [category]: sortRecordsForCategory(category, records)
           }));
           setLoadingByCategory((previous) => ({
             ...previous,
@@ -106,6 +114,30 @@ function AdminPage() {
     }
   };
 
+  const handleMoveProject = async (recordId, direction) => {
+    if (activeCategory !== "projects") {
+      return;
+    }
+
+    const fromIndex = currentRecords.findIndex((record) => record.id === recordId);
+    const toIndex = fromIndex + direction;
+
+    if (fromIndex < 0 || toIndex < 0 || toIndex >= currentRecords.length) {
+      return;
+    }
+
+    const reordered = [...currentRecords];
+    const [movedRecord] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, movedRecord);
+
+    try {
+      setErrorMessage("");
+      await reorderCollectionItems("projects", reordered.map((record) => record.id));
+    } catch (error) {
+      setErrorMessage(error.message || "Failed to update project order.");
+    }
+  };
+
   const handleInputChange = (name, value) => {
     setFormValues((previous) => ({
       ...previous,
@@ -137,6 +169,14 @@ function AdminPage() {
 
     try {
       const payload = normalizePayload(activeCategory, formValues);
+
+      if (activeCategory === "projects" && !editingId) {
+        const highestOrder = currentRecords.reduce(
+          (maximumOrder, record) => Math.max(maximumOrder, Number(record.order) || 0),
+          0
+        );
+        payload.order = highestOrder + 1;
+      }
 
       if (activeCategory === "projects" && selectedImageFiles.length > 0) {
         setIsImageUploading(true);
@@ -249,6 +289,8 @@ function AdminPage() {
           loading={currentLoading}
           onEdit={openEditForm}
           onDelete={handleDelete}
+          onMoveUp={(id) => handleMoveProject(id, -1)}
+          onMoveDown={(id) => handleMoveProject(id, 1)}
         />
       </motion.section>
     </main>

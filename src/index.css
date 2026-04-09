@@ -34,6 +34,56 @@ body,
   box-sizing: border-box;
 }
 
+/* Galaxy-themed global scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.7) rgba(9, 9, 11, 0.75);
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(56, 189, 248, 0.18), transparent 55%),
+    linear-gradient(180deg, rgba(9, 9, 11, 0.9), rgba(24, 24, 27, 0.92));
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 2px solid rgba(9, 9, 11, 0.85);
+  background:
+    linear-gradient(180deg, rgba(125, 211, 252, 0.95), rgba(59, 130, 246, 0.78));
+  box-shadow:
+    0 0 10px rgba(56, 189, 248, 0.34),
+    inset 0 0 8px rgba(224, 242, 254, 0.28);
+  transition: background 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(180deg, rgba(165, 243, 252, 0.96), rgba(14, 165, 233, 0.9));
+  box-shadow:
+    0 0 16px rgba(34, 211, 238, 0.5),
+    inset 0 0 12px rgba(224, 242, 254, 0.35);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background:
+    linear-gradient(180deg, rgba(34, 211, 238, 0.92), rgba(59, 130, 246, 0.8));
+  box-shadow:
+    0 0 20px rgba(56, 189, 248, 0.58),
+    inset 0 0 14px rgba(224, 242, 254, 0.42);
+}
+
+*::-webkit-scrollbar-corner {
+  background: rgba(9, 9, 11, 0.9);
+}
+
 .galaxy-bg-layer {
   position: fixed;
   inset: 0;
@@ -468,53 +518,33 @@ button:focus-visible,
   }
 
   .project-flip-card {
-    min-height: auto;
+    min-height: 420px;
   }
 
   .project-flip-inner {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    min-height: 0;
+    display: block;
+    min-height: 420px;
   }
 
   .project-flip-face {
-    position: relative;
+    position: absolute;
+    inset: 0;
     padding: 1rem;
-    backface-visibility: visible;
-    -webkit-backface-visibility: visible;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   .project-flip-front,
   .project-flip-back {
-    min-height: unset;
-  }
-
-  .project-flip-card:hover .project-flip-inner,
-  .project-flip-card:focus-within .project-flip-inner,
-  .project-flip-card.is-flipped .project-flip-inner {
-    transform: none !important;
-  }
-
-  .project-flip-front {
-    display: block;
+    min-height: 0;
   }
 
   .project-flip-back {
-    display: none;
-    border-top: 1px solid rgba(63, 63, 70, 0.9);
-  }
-
-  .project-flip-card.is-flipped .project-flip-front {
-    display: none;
-  }
-
-  .project-flip-card.is-flipped .project-flip-back {
-    display: flex;
+    transform: rotateY(180deg);
   }
 
   .project-flip-back .ql-editor-display {
-    max-height: 11rem;
+    max-height: 13rem;
     overflow: auto;
   }
 }

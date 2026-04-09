@@ -5,7 +5,6 @@ import RichTextDisplay from "./RichTextDisplay";
 
 function ProjectFlipCard({ project }) {
   const [isFlipped, setIsFlipped] = useState(false);
-  const hasProjectLinks = Boolean(project.githubLink || project.liveLink);
 
   const galleryImages = useMemo(() => {
     if (Array.isArray(project.images) && project.images.length > 0) {
@@ -64,14 +63,14 @@ function ProjectFlipCard({ project }) {
           <h4 className="text-lg font-semibold text-zinc-100">{project.title}</h4>
 
           {project.description ? (
-            <div className="mt-3 max-h-56 overflow-auto pr-1">
+            <div className="mt-3 min-h-0 flex-1 overflow-auto pr-1">
               <RichTextDisplay html={project.description} className="text-zinc-300" />
             </div>
           ) : (
-            <p className="mt-3 text-sm text-zinc-400">No description provided yet.</p>
+            <p className="mt-3 min-h-0 flex-1 text-sm text-zinc-400">No description provided yet.</p>
           )}
 
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-4 flex flex-wrap gap-3">
             {project.githubLink && (
               <a
                 href={project.githubLink}
