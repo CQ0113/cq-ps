@@ -12,10 +12,12 @@ function CollectionForm({
   onClose,
   onInputChange,
   onProjectImageChange,
+  onBackgroundMusicChange,
   onSubmit,
   isSaving,
   isImageUploading,
-  selectedImageCount = 0
+  selectedImageCount = 0,
+  selectedMusicName = ""
 }) {
   if (!isOpen) return null;
 
@@ -182,6 +184,29 @@ function CollectionForm({
                 className="mt-2 h-36 w-full rounded-lg border border-zinc-700 object-cover"
               />
             ) : null}
+          </label>
+        )}
+
+        {category === "personal" && (
+          <label className="md:col-span-2 flex flex-col gap-2 text-xs uppercase tracking-[0.12em] text-zinc-400">
+            Upload Background Music (MP3)
+            <input
+              type="file"
+              accept="audio/mpeg,audio/mp3"
+              onChange={(event) => onBackgroundMusicChange?.(event.target.files)}
+              className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 file:mr-3 file:rounded-md file:border-0 file:bg-cyan-500 file:px-3 file:py-1 file:text-xs file:font-medium file:text-white"
+            />
+            {selectedMusicName && (
+              <span className="text-[11px] text-emerald-300">
+                Selected track: {selectedMusicName}
+              </span>
+            )}
+            {formValues.backgroundMusicUrl && (
+              <audio controls preload="none" className="w-full">
+                <source src={formValues.backgroundMusicUrl} type="audio/mpeg" />
+                Your browser does not support audio preview.
+              </audio>
+            )}
           </label>
         )}
 

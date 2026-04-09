@@ -116,6 +116,12 @@ export const categoryConfig = {
         label: "Avatar URL (auto-filled after upload)",
         type: "url",
         required: false
+      },
+      {
+        name: "backgroundMusicUrl",
+        label: "Background Music URL (auto-filled after upload)",
+        type: "url",
+        required: false
       }
     ]
   }

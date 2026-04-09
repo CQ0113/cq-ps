@@ -16,7 +16,11 @@ import {
   mapRecordToFormValues,
   normalizePayload
 } from "../utils/formHelpers";
-import { uploadPersonalAvatar, uploadProjectImages } from "../services/storageService";
+import {
+  uploadBackgroundMusic,
+  uploadPersonalAvatar,
+  uploadProjectImages
+} from "../services/storageService";
 import TabNav from "../components/admin/TabNav";
 import CollectionForm from "../components/admin/CollectionForm";
 import CollectionList from "../components/admin/CollectionList";
@@ -37,6 +41,7 @@ function AdminPage() {
   const [formValues, setFormValues] = useState(getInitialFormValues("projects"));
   const [isSaving, setIsSaving] = useState(false);
   const [selectedImageFiles, setSelectedImageFiles] = useState([]);
+  const [selectedMusicFile, setSelectedMusicFile] = useState(null);
   const [isImageUploading, setIsImageUploading] = useState(false);
 
   const displayEmail = useMemo(() => user?.email ?? "owner", [user]);
@@ -83,6 +88,7 @@ function AdminPage() {
     setIsFormOpen(false);
     setEditingId(null);
     setSelectedImageFiles([]);
+    setSelectedMusicFile(null);
     setFormValues(getInitialFormValues(activeCategory));
   }, [activeCategory]);
 
@@ -94,6 +100,7 @@ function AdminPage() {
   const openAddForm = () => {
     setEditingId(null);
     setSelectedImageFiles([]);
+    setSelectedMusicFile(null);
     setFormValues(getInitialFormValues(activeCategory));
     setIsFormOpen(true);
   };
@@ -101,6 +108,7 @@ function AdminPage() {
   const openEditForm = (record) => {
     setEditingId(record.id);
     setSelectedImageFiles([]);
+    setSelectedMusicFile(null);
     setFormValues(mapRecordToFormValues(activeCategory, record));
     setIsFormOpen(true);
   };
@@ -162,6 +170,14 @@ function AdminPage() {
     });
   };
 
+  const handleBackgroundMusicChange = (files) => {
+    const incomingFiles = Array.isArray(files) ? files : Array.from(files ?? []);
+    if (incomingFiles.length === 0) {
+      return;
+    }
+    setSelectedMusicFile(incomingFiles[0]);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSaving(true);
@@ -195,6 +211,12 @@ function AdminPage() {
         payload.avatar = uploadedUrl;
       }
 
+      if (activeCategory === "personal" && selectedMusicFile) {
+        setIsImageUploading(true);
+        const uploadedMusicUrl = await uploadBackgroundMusic(selectedMusicFile, user?.uid);
+        payload.backgroundMusicUrl = uploadedMusicUrl;
+      }
+
       if (editingId) {
         await updateCollectionItem(activeCategory, editingId, payload);
       } else {
@@ -203,6 +225,7 @@ function AdminPage() {
       setIsFormOpen(false);
       setEditingId(null);
       setSelectedImageFiles([]);
+      setSelectedMusicFile(null);
       setFormValues(getInitialFormValues(activeCategory));
     } catch (error) {
       setErrorMessage(error.message || "Failed to save record.");
@@ -277,10 +300,12 @@ function AdminPage() {
           onClose={() => setIsFormOpen(false)}
           onInputChange={handleInputChange}
           onProjectImageChange={handleProjectImageChange}
+          onBackgroundMusicChange={handleBackgroundMusicChange}
           onSubmit={handleSubmit}
           isSaving={isSaving}
           isImageUploading={isImageUploading}
           selectedImageCount={selectedImageFiles.length}
+          selectedMusicName={selectedMusicFile?.name ?? ""}
         />
 
         <CollectionList

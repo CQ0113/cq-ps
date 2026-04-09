@@ -42,3 +42,19 @@ export async function uploadProjectImages(files, userId = "admin") {
 
   return Promise.all(uploadPromises);
 }
+
+export async function uploadBackgroundMusic(file, userId = "admin") {
+  const extension = file.name.split(".").pop() || "mp3";
+  const safeName = file.name
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9.-]/g, "")
+    .toLowerCase();
+  const filePath = `personal/${userId}/music/${Date.now()}-${safeName || `bgm.${extension}`}`;
+  const storageRef = ref(storage, filePath);
+
+  await uploadBytes(storageRef, file, {
+    contentType: file.type || "audio/mpeg"
+  });
+
+  return getDownloadURL(storageRef);
+}

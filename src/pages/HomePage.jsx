@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { subscribeToCollection } from "../services/firestoreService";
 import RichTextDisplay from "../components/RichTextDisplay";
@@ -13,6 +13,7 @@ function HomePage() {
   const [personal, setPersonal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const audioRef = useRef(null);
 
   // Fetch data from Firestore collections
   useEffect(() => {
@@ -159,8 +160,50 @@ function HomePage() {
     tiltY.set(0);
   };
 
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !personal?.backgroundMusicUrl) {
+      return;
+    }
+
+    audio.volume = 0.35;
+
+    const tryAutoPlay = async () => {
+      try {
+        await audio.play();
+      } catch {
+        // If autoplay is blocked, retry on first user interaction.
+        const resumePlayback = async () => {
+          try {
+            await audio.play();
+            window.removeEventListener("pointerdown", resumePlayback);
+            window.removeEventListener("keydown", resumePlayback);
+          } catch {
+            // Keep listener for next interaction.
+          }
+        };
+
+        window.addEventListener("pointerdown", resumePlayback, { once: true });
+        window.addEventListener("keydown", resumePlayback, { once: true });
+      }
+    };
+
+    tryAutoPlay();
+  }, [personal?.backgroundMusicUrl]);
+
   return (
     <main className="mx-auto w-full max-w-6xl px-6 py-20">
+      {personal?.backgroundMusicUrl && (
+        <audio
+          ref={audioRef}
+          src={personal.backgroundMusicUrl}
+          loop
+          autoPlay
+          playsInline
+          preload="auto"
+        />
+      )}
+
       {/* Hero Section with Text Stagger */}
       <motion.section
         initial="hidden"
